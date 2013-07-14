@@ -80,11 +80,11 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
         <h2>レスポンスデータ</h2>
         <pre>
         <?php
-            //print_r($lwws_ary);
+            print_r($lwws_ary);
            
             echo '<h3>'.$lwws_ary['location']['prefecture'].' - '.$lwws_ary['location']['city'].'</h3>';
             echo '<table border="1" cellpadding="2">';
-            echo '<tr><td></td><td>日付</td><td>予報</td><td>最低/最高気温</td><td>画像</td></tr>';
+            echo '<tr> <td></td><td>日付</td><td>予報</td><td>最低/最高気温</td><td>画像</td></tr>';
             foreach($lwws_ary['forecasts'] as $forecasts=>$idx){
                 echo '<tr><td>'.$idx['dateLabel'].'</td>';
                 echo '<td>'.$idx['date'].'</td>';
