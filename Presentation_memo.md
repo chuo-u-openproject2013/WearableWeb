@@ -29,3 +29,5 @@ Wearable Web
 ## デモ
 
 ## 展望
+
+![システム構成](images/system.png)
