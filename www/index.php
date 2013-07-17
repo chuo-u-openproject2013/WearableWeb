@@ -36,7 +36,7 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
         <title>Wearable Web</title>
     </head>
     <body>
-	<h1>weather.qawsedrftgyhujikolp.net</h1>
+	<h1>本日の服装は…？</h1>
         <form action="index.php" name="CityForm" method="post">
                     <label>都道府県:</label>
                     <select name="pref" onchange="Select(this)">
@@ -56,8 +56,7 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
         </form>
         
         <?php if(isset($POSTDATA)){ ?>
-        <h2>レスポンスデータ</h2>
-        <pre>
+        <h2>天気予報</h2>
         <?php
             echo '<h3>'.$lwws_ary['location']['prefecture'].' - '.$lwws_ary['location']['city'].'</h3>';
             echo '<table border="1" cellpadding="2">';
@@ -72,6 +71,9 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
             echo '</table>';
          ?>
          <p>Powered by <a href="http://weather.livedoor.com/weather_hacks/webservice">livedoor 天気情報</a></p>
+         
+         <h2>快適な服装！</h2>
+         <p style="font-size: 2em;color: red;">工事中！！！！</p>
          <? } ?>
 
     </body>
