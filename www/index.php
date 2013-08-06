@@ -71,9 +71,14 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
             echo '</table>';
          ?>
          <p>Powered by <a href="http://weather.livedoor.com/weather_hacks/webservice">livedoor 天気情報</a></p>
+        
+         <h2>Debug</h2>
+         <pre>
+         <?php print_r($lwws_ary); ?>
+         </pre>
          
          <h2>快適な服装！</h2>
-         <p style="font-size: 2em;color: red;">工事中！！！！</p>
+         <p style="font-size: 1.5em;color: red;">工事中！！！！</p>
          <? } ?>
 
     </body>
