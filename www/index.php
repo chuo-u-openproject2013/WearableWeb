@@ -1,27 +1,9 @@
 <?php
-//City IDデータ読み込み
-$city_data = unserialize(file_get_contents('app/city_data.dat'));
-$lwws_url = 'http://weather.livedoor.com/forecast/webservice/json/v1';
+require_once 'lib/request_lwws.php';
+require_once 'lib/func.php';
 
-if (isset($_POST['city'])&& $_POST['city']!=""){
-    $POSTDATA = $_POST['city'];
-    //正しいデータかチェック
-    if(preg_match("/^[0-9]+$/", $POSTDATA)){
-        $lwws_url .= '?city='.sprintf("%06d", $POSTDATA);
-        
-        if(function_exists('curl_init')) {
-            $ch = curl_init();
-            curl_setopt( $ch, CURLOPT_URL, $lwws_url );
-            curl_setopt( $ch, CURLOPT_HEADER, false );
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-            curl_setopt( $ch, CURLOPT_FAILONERROR, true);
-            $response = curl_exec( $ch );
-            curl_close( $ch );
-            } else {
-            $response = @file_get_contents($lwws_url);
-            }
-        $lwws_ary = json_decode($response, true);
-    }
+if (isset($_POST['city']) && $_POST['city']!=''){
+    $lwws_ary = request_lwws($_POST['city']);
 }
 ?>
 
@@ -42,7 +24,7 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
                     <select name="pref" onchange="Select(this)">
                         <option value="" selected></option>
                         <?php
-                        $pref = array_keys($city_data);
+                        $pref = list_pref();
                         foreach ($pref as $val){
                             echo '<option value="'.$val.'">'.$val.'</option>'."\n";
                         }
@@ -55,7 +37,7 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
                     <input type="submit" value="送信">
         </form>
         
-        <?php if(isset($POSTDATA)){ ?>
+        <?php if(isset($lwws_ary)){ ?>
         <h2>天気予報</h2>
         <?php
             echo '<h3>'.$lwws_ary['location']['prefecture'].' - '.$lwws_ary['location']['city'].'</h3>';
@@ -79,7 +61,7 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
          
          <h2>快適な服装！</h2>
          <p style="font-size: 1.5em;color: red;">工事中！！！！</p>
-         <? } ?>
+         <?php } ?>
 
     </body>
 </html>
