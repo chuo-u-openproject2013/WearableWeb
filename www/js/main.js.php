@@ -1,6 +1,14 @@
-<?php if(0) { ?><script><?php } ?>
+<?php
+
+if ( !defined('DAT_DIR')){
+    define('DAT_DIR', '/../dat/');
+}
+
+?>
+
+<?php /*IDE highlight hack*/ if(0) { ?><script><?php } ?>
     
-var PrefCity = <?php include('../dat/pref_city.json') ?>; 
+var PrefCity = <?php include(DAT_DIR.'pref_city.json') ?>; 
 
 console.log(PrefCity);
 
@@ -33,4 +41,4 @@ function onSelect(Obj){
     }
 }
 
-<?php if(0) { ?></script><?php } ?>
+<?php /*IDE highlight hack*/ if(0) { ?></script><?php } ?>

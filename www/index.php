@@ -1,10 +1,15 @@
 <?php
-require_once 'lib/func.php';
-require_once 'lib/owm_api.php';
+/*
+ * Wearable Web Project
+ * 
+ * https://github.com/chuo-u-openproject2013/WearableWeb
+ * 
+ */
 
 if (isset($_POST['city']) && $_POST['city']!=''){
     
 }
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -20,9 +25,23 @@ if (isset($_POST['city']) && $_POST['city']!=''){
     <title>Wearable Web</title>
 </head>
 <body onload="Init();">
+    <div class="navbar">
+    <div class="navbar-inner">
     <div class="container">
+        <a class="brand">Wearable Web</a>
+    </div>
+    </div>
+    </div>
+    
+    <div class="container content">
+        
+        <div class="hero-unit">
         <h1>本日の服装は…？</h1>
+        <p>地域の気象予報からあなたに最適な服装を提案します。</p>
+        </div>
+        
         <hr>
+            
         <div class="row">
             <div class="span3">
                 <form action="index.php" class="form-vertical" method="post">

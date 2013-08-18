@@ -1,9 +1,8 @@
 body {
-    margin: 1em;
     background: #aaaaaa;
 }
 
-.container {
+.content {
     background: #ffffff;
     padding: 1em;
     border-radius: 1em;
