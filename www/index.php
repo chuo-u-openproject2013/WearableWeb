@@ -19,7 +19,7 @@ if (isset($_POST['city']) && $_POST['city']!=''){
     <script src="js/main.js.php" type="text/javascript"></script>
     <title>Wearable Web</title>
 </head>
-<body onload="Init()">
+<body onload="Init();">
     <div class="container">
         <h1>本日の服装は…？</h1>
         <hr>
@@ -27,7 +27,7 @@ if (isset($_POST['city']) && $_POST['city']!=''){
             <div class="span3">
                 <form action="index.php" class="form-vertical" method="post">
                     <label>都道府県:</label>
-                    <select id="pref" name="pref" onchange="onSelect(this)">
+                    <select id="pref" name="pref" onchange="onSelect(this);">
                         <option value="" selected></option>
                     </select>
                     <label>都市:</label>
