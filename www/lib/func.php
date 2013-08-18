@@ -19,9 +19,10 @@ function get_contents( $url ){
 /* 都道府県名の配列を返す */
 function list_pref(){
     // City IDデータ読み込み
-    $city_data = unserialize(file_get_contents(dirname(__FILE__).'/city_data.dat'));
+    $city_data = (array)json_decode(file_get_contents('../dat/pref_city.json'));
     $pref = array_keys($city_data);
     return $pref;
 }
+
 
 ?>
