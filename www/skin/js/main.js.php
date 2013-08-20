@@ -5,22 +5,23 @@ if ( !defined('DAT_DIR')){
 }
 
 ?>
+
 <?php /*IDE highlight hack*/ if(0) { ?><script><?php } ?>
     
 var PrefCity = <?php include(DAT_DIR.'pref_city.json') ?>; 
 
+console.log(PrefCity);
+
 function Init(){
     var PrefSelect = document.getElementById('pref');
-    PrefSelect.length = CntHashLength(PrefCity)+1;
-    var i = 1;
+    PrefSelect.length = CntHashLength(PrefCity);
+    var i = 0;
     for (var pref in PrefCity){
             PrefSelect.options[i].text = pref;
             PrefSelect.options[i].value = pref;
             i++;
     }
 }
-
-window.addEventListener( 'load', Init, false );
 
 function CntHashLength(ary){
     var cnt = 0;

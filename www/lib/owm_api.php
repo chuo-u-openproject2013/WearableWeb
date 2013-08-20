@@ -15,14 +15,16 @@ define('BASE_URL', 'http://api.openweathermap.org/data/2.5/');
 if( !defined('LIB_DIR')){
     define('LIB_DIR', '');
 }
+if( !defined('DAT_DIR')){
+    define('DAT_DIR', '../dat/');
+}
 
-require_once(LIB_DIR.'func.php');
-
+require_once LIB_DIR.'func.php';
 
 //-----------------------------------
 
 function getCityidByName($name){
-    $id_array = (array)json_decode(file_get_contents('../dat/city_id.json'));
+    $id_array = (array)json_decode(file_get_contents(DAT_DIR.'city_id.json'));
     if(isset($id_array[$name])){
         return $id_array[$name];
     }else{

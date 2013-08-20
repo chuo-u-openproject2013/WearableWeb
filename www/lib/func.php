@@ -1,5 +1,14 @@
 <?php
 
+if( !defined('LIB_DIR')){
+    define('LIB_DIR', '');
+}
+if( !defined('DAT_DIR')){
+    define('DAT_DIR', '../dat/');
+}
+
+//-----------------------------------
+
 function get_contents($url){
     if(function_exists('curl_init')) {
         $ch = curl_init();
@@ -20,7 +29,7 @@ function get_contents($url){
 /* 都道府県名の配列を返す */
 function list_pref(){
     // City IDデータ読み込み
-    $city_data = (array)json_decode(file_get_contents('../dat/pref_city.json'));
+    $city_data = (array)json_decode(file_get_contents(DAT_DIR.'pref_city.json'));
     $pref = array_keys($city_data);
     return $pref;
 }
