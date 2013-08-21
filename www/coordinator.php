@@ -15,9 +15,9 @@ if (isset($_POST['city']) && $_POST['city']!=''){
 //-----------------------------------
 
 $body['left'] = <<< EOM
-<form action="index.php" class="form-vertical" method="post">
+<form class="form-vertical" method="post">
     <label>都道府県:</label>
-    <select id="pref" name="pref" onchange="onSelect(this);">
+    <select id="pref" name="pref">
         <option value="" selected>&lt;選択してください&gt;</option>
     </select>
     <label>都市:</label>
