@@ -1,4 +1,5 @@
 <?php
+header("Content-type: application/x-javascript");
 
 if ( !defined('DAT_DIR')){
     define('DAT_DIR', '../dat/');
@@ -42,5 +43,40 @@ function onSelect(){
         i++;
     }
 }
+
+//-----------------------------------
+
+
+(function($){
+    var submitBtn = $("#submit");
+
+    submitBtn.click( function(){
+        var cityid = $("#city option:selected").val();
+        
+        if(cityid ==''){
+            alert("未選択です");
+            return;
+        }
+        
+        jqXHR = $.getJSON("ajax.php", {"action": "weather", "cityid":cityid });
+    
+        jqXHR.done( function(data, status, xhr){
+            $('#description').html('<h2>'+$("#pref option:selected").text()+$("#city option:selected").text()+'</h2>');
+            $("#debug").html("<pre>"+xhr.responseText+"</pre>");
+        });
+
+        jqXHR.fail( function(){
+            $("#right").prepend('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>データの読み込みに失敗。時間を空けて再試行してください。</div>');
+        });
+
+        jqXHR.always( function(){
+            $("#location_form").children().removeAttr("disabled");
+        });
+    
+        $("#location_form").children().attr("disabled", "true");
+    });
+    
+})(jQuery);
+
 
 <?php /*IDE highlight hack*/ if(0) { ?></script><?php } ?>

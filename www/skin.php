@@ -30,10 +30,10 @@
         <hr>
             
         <div class="row">
-            <div class="span3">
+            <div class="span3" id="left">
                 <?php echo $body['left']; ?>
             </div>
-            <div class="span8 offset1">
+            <div class="span9" id="right">
                 <?php echo $body['right']; ?>
             </div>
         </div>
@@ -43,7 +43,7 @@
     
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/main.js.php" type="text/javascript"></script>
+    <?php echo $scripts; ?>
 </body>
 </html>
 

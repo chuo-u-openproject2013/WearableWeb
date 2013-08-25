@@ -4,6 +4,8 @@
  * 
  * https://github.com/chuo-u-openproject2013/WearableWeb
  * 
+ * Copyright (c) 0x5A4D
+ * 
  */
 
 

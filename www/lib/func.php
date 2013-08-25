@@ -26,12 +26,18 @@ function get_contents($url){
     return $result;
 }
 
-/* 都道府県名の配列を返す */
-function list_pref(){
-    // City IDデータ読み込み
-    $city_data = (array)json_decode(file_get_contents(DAT_DIR.'pref_city.json'));
-    $pref = array_keys($city_data);
-    return $pref;
+
+function obj2ary($obj)
+{
+    if (!is_object($obj) && !is_array($obj) ){
+        return $obj;
+    }
+    
+    $ary = (array)$obj;
+    foreach($ary as &$ch){
+        $ch = obj2ary($ch);
+    }
+    return $ary;
 }
 
 

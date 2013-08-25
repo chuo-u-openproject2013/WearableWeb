@@ -15,22 +15,30 @@ if (isset($_POST['city']) && $_POST['city']!=''){
 //-----------------------------------
 
 $body['left'] = <<< EOM
-<form class="form-vertical" method="post">
+<form class="form-vertical" id="location_form" method="post">
     <label>都道府県:</label>
-    <select id="pref" name="pref">
+    <select class="span3" id="pref">
         <option value="" selected>&lt;選択してください&gt;</option>
     </select>
     <label>都市:</label>
-    <select id="city" name="city">
+    <select class="span3" id="city">
         <option value=""></option>
     </select>
     <br />
-    <input class="btn btn-primary" type="submit" value="送信">
+    <input class="btn btn-primary" id="submit" type="button" value="送信">
 </form>
 EOM;
 
 $body['right'] = <<< EOM
+<div id="description"></div>
+<div id="chart"></div>
+<div id="debug"></div>
+EOM;
 
+
+$scripts = <<< EOM
+<script src="js/highcharts.js" type="text/javascript"></script>
+<script src="js/main.js.php" type="text/javascript"></script>    
 EOM;
 
 ?>
