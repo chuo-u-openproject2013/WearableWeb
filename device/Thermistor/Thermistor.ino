@@ -1,13 +1,21 @@
+/*
+ * NTCTサーミスタの温度特性式による温度測定
+ *
+ * (参考)http://www.mmea.com/pdf/Division_PDF/80.pdf
+ *       http://www.ohizumi-mfg.jp/products/tech01.html
+ * https://github.com/chuo-u-openproject2013/WearableWeb
+*/
+
 #include<math.h>
 
-// PullUp抵抗 
-const long R_pu = 3300;
 // B定数
 const int B = 3380;
 // 基準温度(K)
 const double T0 = 25 + 273.15;
 // 基準抵抗
 const long R0 = 10000;
+// PullUp抵抗 
+const long R_pu = 3300;
 
 void setup() {
   Serial.begin(9600);
@@ -33,7 +41,7 @@ void loop() {
   Serial.print(", ");
   Serial.print(Volt);
   Serial.print(", ");
-  Serial.print(R_th);
+  Serial.println(R_th);
   Serial.print(", ");
   Serial.print(T - 273.15);
   Serial.print("\n");

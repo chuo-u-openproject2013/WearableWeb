@@ -62,4 +62,3 @@ function owm_build_query($param){
 
 
 ?>
-
