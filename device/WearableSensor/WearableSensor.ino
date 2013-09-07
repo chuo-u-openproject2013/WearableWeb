@@ -14,15 +14,18 @@
 #include <math.h>
 
 void setup() {
+  pinMode( 2, INPUT_PULLUP); //割り込み
   Serial.begin(9600);
   InitTime();
 }
 
+double temp[2] = {0}; // 温度
+byte cnt = 0;
+  
 void loop() {
-  double temp[2] = {0}; // 温度
   byte tm[7];     // BCDデータ
   char buf[24] ;  // 日付時刻の文字列
-  byte cnt = 0;
+
   
   if(RTC.InterFlag == 1) {
     temp[0] += getTemp(A0, 0);
@@ -42,9 +45,12 @@ void loop() {
       Serial.print(temp[1], 1);
       Serial.print("\n");
       
+      for(int i= 0; i < 2; i++){
+        temp[i] = 0;
+      }
       cnt = 0;
-      RTC.InterFlag = 0;
     }
+    RTC.InterFlag = 0;
   }
 }
 
