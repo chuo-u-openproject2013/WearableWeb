@@ -17,8 +17,10 @@
 #include <SD.h>
 
 /* アナログセンサー */
-const byte numSensPin = 2; // AnalogPin センサー数 (A0～)
-double temp[numSensPin] = {0}; // 温度データ
+const byte numSensPin = 4; // AnalogPin センサー数 (A0～)
+double value[numSensPin] = {0}; // Analog入力値
+double temp[numSensPin]  = {0}; // 温度  
+int offset[numSensPin]   = {0, 0, 0, 0}; // 誤差調整
 
 /* サーミスタ 係数 */
 const int B = 3380; // B定数
@@ -46,12 +48,15 @@ void setup() {
   InitRTC();
 }
 
+//----------------------------------
+
 byte tm[7]; // BCDデータ
 byte cnt = 0; // カウンタ変数
 
 void loop() {
   // データ記録
   getData();
+  cnt++;
 
   // RTC時刻取得
   RTC.rTime(tm);
@@ -61,7 +66,7 @@ void loop() {
     
     // 初期化
     for(int i= 0; i < numSensPin; i++){
-      temp[i] = 0;
+      value[i] = 0;
     }
     cnt = 0;
   }
@@ -78,17 +83,21 @@ void loop() {
 
 /* センサーからデータ取得 */
 void getData(){
-  for(int i = 0; i < numSensPin; i++){
-    temp[i] += getTemp(i+14, 0);
+  for(byte i = 0; i < numSensPin; i++){
+    unsigned long temp = 0;
+    for(byte j = 0; j < 100; j++){ 
+      temp += analogRead(i+14);
+    }
+    value[i] += temp / 100;
   }
-  cnt++;
 }
 
 /* データをSDに保存 */
 void SaveToSD(){
-  // 平均
+  // 平均化・温度計算
   for(int i = 0; i < numSensPin; i++){
-    temp[i] /= cnt;
+    value[i] /= cnt;
+    temp[i] = getTemp(value[i], offset[i]);
   }
   
   // 日時文字列化
@@ -137,19 +146,13 @@ byte getWday(int y, int m, int d){
   return (y + y / 4 - y / 100 + y / 400 + (13 * m + 8) / 5 + d) % 7; 
 } 
 
-/* 温度計算・取得
-   pin: 入力アナログピン
+/* 温度計算
+   Val: analog入力値(0-1023)
    offset: Pullup抵抗 誤差調整 */
-double getTemp(byte pin, int offset){
-  unsigned long Val = 0;   //Analog入力値
-  double R_th;  //サーミスタ抵抗
-  double T;     //温度
+double getTemp(int Val, int offset){
+  double R_th;  // サーミスタ抵抗
+  double T;     // 温度(K)
   
-  for(int i = 0; i < 100; i++){
-    Val  += analogRead(pin);
-  }
-  
-  Val /= 100;
   R_th = (R_pu + offset) * Val / (1023.0 - Val);
   T    = 1 / ( log(R_th/R0)/B + 1/T0 );
   return T - 273.15;
