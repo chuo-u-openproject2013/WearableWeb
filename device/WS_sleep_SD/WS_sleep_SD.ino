@@ -17,16 +17,20 @@
 #include <SD.h>
 
 /* アナログセンサー */
-const byte numSensPin = 4; // AnalogPin センサー数 (A0～)
+const byte numSensPin = 4; // AnalogPin センサー数
+const byte SensPin[numSensPin] = {A0, A1, A2, A3};  // AnalogPin リスト
 double value[numSensPin] = {0}; // Analog入力値
 double temp[numSensPin]  = {0}; // 温度  
-int offset[numSensPin]   = {0, 0, 0, 0}; // 誤差調整
+int offset[numSensPin]   = {0, -80, 70, 10}; // 誤差調整
 
 /* サーミスタ 係数 */
 const int B = 3380; // B定数
 const double T0 = 25 + 273.15; // 基準温度(K)
 const long R0 = 10000;   // 基準抵抗
 const long R_pu = 10000; // PullUp抵抗
+
+/* SDカード 保存設定*/
+char dat_dir[] = "dat"; // 保存ディレクトリ
 
 //----------------------------------
 
@@ -42,6 +46,8 @@ void setup() {
   }
   else{
     Serial.println("card initialized.");
+    // 保存ディレクトリ作成
+    if (!SD.exists(dat_dir)) SD.mkdir(dat_dir);
   }
   
   // RTC初期化
@@ -72,7 +78,7 @@ void loop() {
   }
   
   // Seria送信待ち
-  delay(50);
+  delay(80);
   // Sleep
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_mode();
@@ -86,7 +92,7 @@ void getData(){
   for(byte i = 0; i < numSensPin; i++){
     unsigned long temp = 0;
     for(byte j = 0; j < 100; j++){ 
-      temp += analogRead(i+14);
+      temp += analogRead(SensPin[i]);
     }
     value[i] += temp / 100;
   }
@@ -101,11 +107,14 @@ void SaveToSD(){
   }
   
   // 日時文字列化
-  char bufRTC[24] ;
+  char bufRTC[24];
+  char date[9]; // yyyymmdd
+  char time[9]; // hh:mm:ss
   RTC.cTime(tm, (byte *)bufRTC);
+  sscanf(bufRTC, "%4s/%2s/%2s %*s %8s", &date[0], &date[4], &date[6], time);
   
   // 日時・データをStringに連結
-  String dataString = String(bufRTC) + ",";
+  String dataString = String(time) + ",";
   for(int i = 0; i < numSensPin; i++){
     char str[6];
     dtostrf(temp[i], 5, 1, str);
@@ -113,6 +122,19 @@ void SaveToSD(){
     if(i != numSensPin-1) dataString += ",";
   }
   
+  // ファイルネーム作成
+  char filename[13 + strlen(dat_dir)]; // 8.3形式
+  sprintf(filename, "%s/%s.%s\0", dat_dir, date, "log");
+  
+  // SDカードに書き込み
+  File dataFile = SD.open(filename, FILE_WRITE);
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+  }  
+  else {
+    Serial.println("error opening file");
+  } 
   Serial.println(dataString);
 }
 
