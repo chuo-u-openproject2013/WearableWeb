@@ -102,6 +102,10 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
         padding: 10px;
         margin-bottom: 20px;
     }
+    
+    .table{
+        font-size: 120%;
+    }
     </style>
 </head>
 <body>
@@ -128,7 +132,7 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
             <div id="message"></div>
             
             <!-- 左カラム -->
-            <div class="span4">
+            <div class="span5">
                <div class="accordion">
                <div class="accordion-group">
                 <div class="accordion-heading">
@@ -145,21 +149,29 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
                 </div>
               </div>
               </div>
-              
+                  
               <div class="div-normal">
-                <h2>現在の私</h2>
-                <p id="recent-time-p">最終更新時間: <span id="recent-time"></span></p>
-                <table class="table" id="current-data">
-                    <tr>
-                        <th>場所</th>
-                        <th>温度(℃)</th>
-                    </tr>
-                </table>
+                <h2>被服気候: <span id="cloth-rank"></span></h2>
+                <div class="progress" id="cloth-rank-bar">
+                    <div class="bar" style="width: 50%"></div>
+                </div>
               </div>
             </div>
-            
+                
             <!-- 右カラム -->
-            <div class="span8">
+            <div class="span7">
+                <div class="div-normal">
+                   <h2>現在の私</h2>
+                   <p id="recent-time-p">最終更新時間: <span id="recent-time"></span></p>
+                   <table class="table table-bordered table-hover" id="current-data">
+                       <tr>
+                           <th>場所</th>
+                           <th>温度(℃)</th>
+                       </tr>
+                   </table>
+                 </div>
+                
+                <div id="graph"></div>
                 <div id="debug"></div>
             </div>
 
@@ -168,7 +180,7 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
     </div>
 
     <script>
-      var sens_num = 4;                                                                          
+      var sens_num  = 4;     // センサー数
       var sens_position = Array("胸", "背中", "脚", "周辺気温");
       
       // 最初のデータ取得か
@@ -193,16 +205,19 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
      
      // 取得データを処理
      function main(data){
-         var data = $.csv()(data);
-         console.log(data);
+         var data = $.csv()(data); // CSV to Array 
+         //console.log(data);
          
          // 最新のデータ抽出
          var recent_data= data[data.length - 1];
          $("#recent-time").html(recent_data[0]);
          
+         // tableに出力
          if(first){ // 最初ならタグ出力
             for(var i = 0; i < sens_num ; i++){ // センサーデータ数分
                 $("#current-data").append("<tr><td>"+ sens_position[i] +"</td><td id=\"sens-"+ i +"\">" + recent_data[i + 1] + "</td></tr>");
+                // フラグ降ろす
+                first = false;
             }
          }else{
             for(var i = 0; i < sens_num ; i++){
@@ -210,10 +225,38 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
             }
          }
          
+         // 被服気候計算
+            // 被服内温度の平均
+         var temp_avg = 0;
+         for(var i = 0; i < sens_num - 1; i++){ //周辺気温除く
+            temp_avg += parseFloat(recent_data[i + 1]);
+         }
+         temp_avg /= (sens_num - 1);
          
-         first = false;
+         if(temp_avg < 30.5){ // やや寒い
+             $("#cloth-rank").html("やや寒い");
+             $("#cloth-rank-bar").addClass("progress-info");
+             $("#cloth-rank-bar .bar").css("width", "30%");
+         }else
+         if(temp_avg <= 33.4){ // 快適
+             $("#cloth-rank").html("快適");
+             $("#cloth-rank-bar").addClass("progress-success");
+             $("#cloth-rank-bar .bar").css("width", "50%");
+         }else
+        if(33.4 < temp_avg){ // やや暑い
+             $("#cloth-rank").html("やや暑い");
+             $("#cloth-rank-bar").addClass("progress-warning");
+             $("#cloth-rank-bar .bar").css("width", "75%");
+         }else         
+        if(36.4 < temp_avg){ // 暑い
+             $("#cloth-rank").html("暑い");
+             $("#cloth-rank-bar").addClass("progress-danger");
+             $("#cloth-rank-bar .bar").css("width", "100%");
+         } 
+        
      }
 
+    
     (function($){
         // 日付取得
         var now = new Date();
