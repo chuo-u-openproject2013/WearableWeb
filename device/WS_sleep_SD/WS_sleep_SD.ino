@@ -117,7 +117,7 @@ void SaveToSD(){
   String dataString = String(time) + ",";
   for(int i = 0; i < numSensPin; i++){
     char str[6];
-    dtostrf(temp[i], 5, 1, str);
+    dtostrf(temp[i], 5, 1, str); // 文字列を実数に変換 (-)xx.x
     dataString += String(str);
     if(i != numSensPin-1) dataString += ",";
   }
