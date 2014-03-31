@@ -1,10 +1,8 @@
 /*
- * Wearable Web Project
- *
  * Copyright (c) 0x5A4D
  * https://github.com/chuo-u-openproject2013/WearableWeb
 ---------------------------------------------------------
- * RTC-8564NBのライブラリは以下のskRTClibを利用させていただいています。
+ * 以下のskRTClibを利用しています
  * http://www.geocities.jp/zattouka/GarageHouse/micon/Arduino/RTC/RTC.htm
  *
 */
@@ -16,27 +14,26 @@
 #include <skRTClib.h>
 #include <SD.h>
 
-/* アナログセンサー */
-const byte numSensPin = 4; // AnalogPin センサー数
-const byte SensPin[numSensPin] = {A0, A1, A2, A3};  // AnalogPin リスト
-double value[numSensPin] = {0}; // Analog入力値
-double temp[numSensPin]  = {0}; // 温度  
-int offset[numSensPin]   = {0, -80, 70, 10}; // 誤差調整
-
-/* サーミスタ 係数 */
-const int B = 3380; // B定数
-const double T0 = 25 + 273.15; // 基準温度(K)
-const long R0 = 10000;   // 基準抵抗
-const long R_pu = 10000; // PullUp抵抗
+/* アナログセンサー設定 */
+const byte numSensPin = 1; // AnalogPin センサー数
+const byte SensPin[numSensPin] = {A0};  // AnalogPin リスト
+float (*calcVal[])(float) = {calcTemp}; // 値計算関数 リスト
+float value[numSensPin] = {0};
 
 /* SDカード 保存設定*/
-char dat_dir[] = "dat"; // 保存ディレクトリ
+char dat_dir[] = "dat"; // 保存先ディレクトリ
+
+//----------------------------------
+/* LM35DZ */
+float calcTemp(float Val){
+  return (Val * 5.0 / 1024) * 100;
+}
 
 //----------------------------------
 
 void setup() {
-  pinMode( 2, INPUT_PULLUP); // 割り込み
-  
+  pinMode(2, INPUT_PULLUP); // 割り込み
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // Sleep Mode
   Serial.begin(9600);
   
   // SDカード初期化
@@ -57,10 +54,10 @@ void setup() {
 //----------------------------------
 
 byte tm[7]; // BCDデータ
-byte cnt = 0; // カウンタ変数
+byte cnt = 0; // カウンタ
 
 void loop() {
-  // データ記録
+  // データ取得
   getData();
   cnt++;
 
@@ -77,10 +74,7 @@ void loop() {
     cnt = 0;
   }
   
-  // Seria送信待ち
-  delay(80);
   // Sleep
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_mode();
 }
 
@@ -90,20 +84,22 @@ void loop() {
 /* センサーからデータ取得 */
 void getData(){
   for(byte i = 0; i < numSensPin; i++){
-    unsigned long temp = 0;
-    for(byte j = 0; j < 100; j++){ 
-      temp += analogRead(SensPin[i]);
+    unsigned long tmp = 0;
+    for(byte j = 0; j < 50; j++){ 
+      tmp += analogRead(SensPin[i]);
     }
-    value[i] += temp / 100;
+    value[i] += tmp / 50;
   }
 }
 
 /* データをSDに保存 */
 void SaveToSD(){
-  // 平均化・温度計算
+  // 平均化・値計算
   for(int i = 0; i < numSensPin; i++){
     value[i] /= cnt;
-    temp[i] = getTemp(value[i], offset[i]);
+    if(calcVal[i] != NULL){
+      value[i] = calcVal[i](value[i]);
+    }
   }
   
   // 日時文字列化
@@ -117,7 +113,7 @@ void SaveToSD(){
   String dataString = String(time) + ",";
   for(int i = 0; i < numSensPin; i++){
     char str[6];
-    dtostrf(temp[i], 5, 1, str); // 文字列を実数に変換 (-)xx.x
+    dtostrf(value[i], 5, 1, str); // 実数を文字列に変換 (-)xx.x
     dataString += String(str);
     if(i != numSensPin-1) dataString += ",";
   }
@@ -135,7 +131,9 @@ void SaveToSD(){
   else {
     Serial.println("error opening file");
   } 
+  
   Serial.println(dataString);
+  delay(80); // Seria送信待ち
 }
 
 //----------------------------------
@@ -167,15 +165,3 @@ byte getWday(int y, int m, int d){
   if(m < 3){y--; m += 12;}
   return (y + y / 4 - y / 100 + y / 400 + (13 * m + 8) / 5 + d) % 7; 
 } 
-
-/* 温度計算
-   Val: analog入力値(0-1023)
-   offset: Pullup抵抗 誤差調整 */
-double getTemp(int Val, int offset){
-  double R_th;  // サーミスタ抵抗
-  double T;     // 温度(K)
-  
-  R_th = (R_pu + offset) * Val / (1023.0 - Val);
-  T    = 1 / ( log(R_th/R0)/B + 1/T0 );
-  return T - 273.15;
-}
