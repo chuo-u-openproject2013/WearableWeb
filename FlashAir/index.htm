@@ -81,7 +81,6 @@
                  </div>
                 
                 <div class="div-normal">
-                    <h3>グラフ</h3>
                     <div id="graph" style="height: 200px; width: 450px;"></div>
                 </div>
 
@@ -101,6 +100,10 @@
                          <label class="checkbox">
                              <input type="checkbox" id="auto-reload" checked="checked">自動更新(5秒)
                          </label>
+                         <label>グラフ表示範囲:
+                            <input type="number" min="1" value="3" style="width: 50px" id="graph-range">分
+                         </label>
+                         <input type="button" value="更新" class="btn" id="reload">
                      </form>
                    </div>
                  </div>
@@ -114,15 +117,27 @@
 
     <script>
       var sens_unit = ["温度(℃)"];
+      
+      var graphRange = 3 * 60 * 1000;
 
     (function(){
         getData();
         
         // 自動更新
-        var interval = 5000;
+        var interval = 10 * 1000;
         setInterval( function(){
             if( $("#auto-reload").prop("checked") === true ) getData();
         }, interval);
+        
+        // 手動更新
+        $("#reload").click( function(){
+            var val = $("#graph-range").val();
+            if( !isNaN(val) && val > 0){
+                graphRange =  val * 60 * 1000;
+            }
+            getData();
+        });
+        
     })();
 
     /* データを取得 */                                                                         
@@ -194,7 +209,7 @@
         // 描画範囲の時間計算
         var today = getDate();
         var recentDate = new Date(today["year"]+"/"+today["month"]+"/"+today["day"]+" "+recentTime);
-        var previousDate = new Date(recentDate.getTime() - 3 * 60 * 1000) ;
+        var previousDate = new Date(recentDate.getTime() - graphRange) ;
         // 描画
         $.jqplot(
             'graph',
