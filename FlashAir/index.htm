@@ -4,22 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal AMeDAS</title>
-    <script src="js/jquery.js"></script>
-    <script src="js/btstrap.js"></script>
-    <script type="text/javascript">
-    /* http://tips.recatnap.info/wiki/JQuery%E3%81%A7CSV%E3%82%92%E9%85%8D%E5%88%97%E3%81%AB%E5%A4%89%E6%8F%9B_%28$.csv%28%29%29 
-    * Usage:
-    *  jQuery.csv()(csvtext)		returns an array of arrays representing the CSV text.
-    *  jQuery.csv("\t")(tsvtext)		uses Tab as a delimiter (comma is the default)
-    *  jQuery.csv("\t", "'")(tsvtext)	uses a single quote as the quote character instead of double quotes
-    *  jQuery.csv("\t", "'\"")(tsvtext)	uses single & double quotes as the quote character
-    *  jQuery.csv(",", "", "\n")(tsvtext)	カンマ区切りで改行コード「\n」
-    */
-    jQuery.extend({csv:function(c,e,f){c="string"==typeof c?RegExp("["+(c||",")+"]"):"undefined"==typeof c?",":c;e="string"==typeof e?RegExp("^["+(e||'"')+"]"):"undefined"==typeof e?'"':e;f="string"==typeof f?RegExp("["+(f||"\r\n")+"]+"):"undefined"==typeof f?"\r\n":f;return function(a){a=a.split(f);for(var b=0,m=a.length;b<m;b++){for(var n=a,p=b,g=a[b].split(c),k=[],h=void 0,d=0,l=g.length;d<l;d++)if(h=g[d].match(e)){for(j=d;j<l&&g[j].charAt(g[j].length-1)!=h[0];j++);h=g.slice(d,j+1).join(c);k.push(h.substr(1,
-h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][0]&&a.splice(b,1);return a}}});
-    </script>
     <link href="css/btstrap.css" rel="stylesheet">
     <link href="css/btstrapr.css" rel="stylesheet">
+    <link href="css/jqplot.css" rel="stylesheet">
+    <script src="js/jquery.js"></script>
+    <script src="js/btstrap.js"></script>
+    <script src="js/jqplot.js"></script>
     <style type="text/css">
     @media screen and (min-width: 768px) {
         .hero-unit{
@@ -89,6 +79,11 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
                    <table class="table table-bordered table-hover" id="current-data">
                    </table>
                  </div>
+                
+                <div class="div-normal">
+                    <h3>グラフ</h3>
+                    <div id="graph" style="height: 200px; width: 450px;"></div>
+                </div>
 
                 <div id="raw"><pre style="height: 200px; overflow-y: scroll"></pre></div>
             </div>
@@ -118,7 +113,6 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
     </div>
 
     <script>
-      var sens_num  = 1;     // センサー数
       var sens_unit = ["温度(℃)"];
 
     (function(){
@@ -131,7 +125,7 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
         }, interval);
     })();
 
-    // データを取得                                                                           
+    /* データを取得 */                                                                         
     function getData(){
         var date = getDate();
         var filename = "DAT/" + date["year"] + date["month"] + date["day"] + ".LOG";
@@ -139,10 +133,6 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
        jqXHR = $.get(filename);
 
        jqXHR.done( function(data, status, xhr){
-           var raw = $("#raw > pre");
-           raw.text(xhr.responseText);
-           raw.scrollTop(raw[0].scrollHeight);
-
            showData(data);
        });
 
@@ -154,30 +144,78 @@ h.length-2));d=j}else k.push(g[d]);n[p]=k}b=a.length-1;1==a[b].length&&""==a[b][
     };                                                                           
      
      
-    // 取得データを処理
+    /* 取得データを処理 */
     function showData(data){
-        var data = $.csv()(data); // CSV to Array 
+        // 生データ出力
+        var raw = $("#raw > pre");
+        raw.text(data);
+        raw.scrollTop(raw[0].scrollHeight);
+        
+        // CSV to Array 
+        var data = $.csv()(data);
+        // 数値にキャスト
+        for(var i = 0; i < data.length; i++){
+            for(var j = 1; j < data[i].length; j++){
+                data[i][j] = Number(data[i][j]);
+            }
+        }
         //console.log(data);
 
         // 最新のデータ抽出
-        var recent_data= data[data.length - 1];
-        $("#recent-time").html(recent_data[0]);
+        var recentData = data[data.length - 1];
+        var recentTime = recentData[0];
+        $("#recent-time").html(recentTime);
 
         // tableに出力
-        if(!$("#current-data>tbody").length){ // 最初ならタグ出力
-           for(var i = 0; i < sens_num ; i++){ // センサーデータ数分
-               $("#current-data").append("<tr><td>"+ sens_unit[i] + 
-                   "</td><td id=\"sens-"+ i +"\">" + recent_data[i + 1] + "</td></tr>");
+        if($("#current-data>tbody").length !== recentData.length){
+            $("#current-data").html("");
+           for(var i = 1; i < recentData.length; i++){
+               $("#current-data").append("<tr><td>"+ sens_unit[i - 1] + 
+                   "</td><td id=\"sens-"+ i +"\">" + recentData[i] + "</td></tr>");
            }
         }else{
-           for(var i = 0; i < sens_num ; i++){
-               $("td#sens-" + i).html(recent_data[i + 1]);
+           for(var i = 0; i < recentData.length; i++){
+               $("td#sens-" + i).html(recentData[i + 1]);
            }
         }
-
+        
+        /* jqPlot */
+        // データ系列生成
+        var plotData = new Array();
+        for(var i = 0; i < data.length; i++){
+            while( plotData.length < (data[i].length - 1)){
+                plotData.push(new Array());
+            }
+            for(var j = 1; j < data[i].length; j++){
+                plotData[j-1].push([ data[i][0], data[i][j] ]);
+            }
+        }
+        //console.log(plotData);
+        // 描画範囲の時間計算
+        var today = getDate();
+        var recentDate = new Date(today["year"]+"/"+today["month"]+"/"+today["day"]+" "+recentTime);
+        var previousDate = new Date(recentDate.getTime() - 3 * 60 * 1000) ;
+        // 描画
+        $.jqplot(
+            'graph',
+            plotData,
+            {
+                axes:{
+                    xaxis:{
+                        renderer: jQuery.jqplot.DateAxisRenderer,
+                        tickInterval: '1 minutes',
+                        min: previousDate,
+                        max: recentDate,
+                        tickOptions: {
+                            formatString: '%H:%M'
+                        }
+                    }
+                }
+            }
+        ).replot();
     }
 
-    // 日付取得
+    /* 日付取得 */
     function getDate(){
         var now = new Date();
         var year = now.getYear();

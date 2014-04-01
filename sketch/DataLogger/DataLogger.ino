@@ -63,7 +63,7 @@ void loop() {
 
   // RTC時刻取得
   RTC.rTime(tm);
-  if( (tm[0] & 0x0F) % 5 == 0 ){ // 5秒ごと
+  if( (tm[0] & 0x0F) == 0 ){ // 10秒ごと
     // 保存処理
     SaveToSD();
     
