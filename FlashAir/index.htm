@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal AMeDAS</title>
+    <script src="js/jquery.js"></script>
+    <script src="js/jqplot.js"></script>
+    <script src="js/btstrap.js"></script>
+    <link href="css/jqplot.css" rel="stylesheet">
     <link href="css/btstrap.css" rel="stylesheet">
     <link href="css/btstrapr.css" rel="stylesheet">
-    <link href="css/jqplot.css" rel="stylesheet">
-    <script src="js/jquery.js"></script>
-    <script src="js/btstrap.js"></script>
-    <script src="js/jqplot.js"></script>
     <style type="text/css">
     @media screen and (min-width: 768px) {
         .hero-unit{
@@ -38,7 +38,7 @@
         color: #0e90d2;
     }
     
-    .div-normal{
+    .div-normal {
         border: 1px solid #e5e5e5;
         border-radius: 3px;
         padding: 10px;
@@ -47,6 +47,11 @@
     
     .table{
         font-size: 140%;
+    }
+    
+    #graph {
+        height: 200px;
+        width: 100%;
     }
     </style>
 </head>
@@ -81,7 +86,7 @@
                  </div>
                 
                 <div class="div-normal">
-                    <div id="graph" style="height: 200px; width: 450px;"></div>
+                    <div id="graph"></div>
                 </div>
 
                 <div id="raw"><pre style="height: 200px; overflow-y: scroll"></pre></div>
