@@ -1,6 +1,9 @@
 /*
- * Copyright (c) 0x5A4D
  * https://github.com/chuo-u-openproject2013/WearableWeb
+ *
+ * Copyright (c) 2014 0x5A4D All rights reserved.
+ * Released under The MIT License.
+ * http://opensource.org/licenses/MIT
 ---------------------------------------------------------
  * 以下のskRTClibを利用しています
  * http://www.geocities.jp/zattouka/GarageHouse/micon/Arduino/RTC/RTC.htm
@@ -24,6 +27,7 @@ float value[numSensPin] = {0};
 char dat_dir[] = "dat"; // 保存先ディレクトリ
 
 //----------------------------------
+
 /* LM35DZ */
 float calcTemp(float Val){
   return (Val * 5.0 / 1024) * 100;
@@ -32,9 +36,10 @@ float calcTemp(float Val){
 //----------------------------------
 
 void setup() {
-  pinMode(2, INPUT_PULLUP); // 割り込み
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // Sleep Mode
+  pinMode(2, INPUT_PULLUP); // 割り込みピン
   Serial.begin(9600);
+  
+  delay(1000);
   
   // SDカード初期化
   Serial.print("Initializing SD card...");
@@ -49,6 +54,8 @@ void setup() {
   
   // RTC初期化
   InitRTC();
+  // sleep_mode設定
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 }
 
 //----------------------------------
